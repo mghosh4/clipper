@@ -37,7 +37,7 @@ class KubernetesContainerManager(ContainerManager):
                  kubernetes_api_ip,
                  redis_ip=None,
                  redis_port=6379,
-                 useInternalIP=False):
+                 useInternalIP=True):
         """
         Parameters
         ----------
@@ -133,7 +133,6 @@ class KubernetesContainerManager(ContainerManager):
 
     def connect(self):
         nodes = self._k8s_v1.list_node()
-
         external_node_hosts = []
         for node in nodes.items:
             for addr in node.status.addresses:
@@ -143,9 +142,10 @@ class KubernetesContainerManager(ContainerManager):
         if len(external_node_hosts) == 0 and (self.useInternalIP):
             msg = "No external node addresses found.Using Internal IP address"
             logger.warn(msg)
-            for addr in node.status.addresses:
-                if addr.type == "InternalIP":
-                    external_node_hosts.append(addr.address)
+            for node in nodes.items:
+                for addr in node.status.addresses:
+                    if addr.type == "InternalIP":
+                        external_node_hosts.append(addr.address)
 
         if len(external_node_hosts) == 0:
             msg = "Error connecting to Kubernetes cluster. No external node addresses found"
