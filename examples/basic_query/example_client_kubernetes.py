@@ -43,7 +43,7 @@ if __name__ == '__main__':
     clipper_conn = ClipperConnection(KubernetesContainerManager(useInternalIP=True))
     clipper_conn.start_clipper()
     python_deployer.create_endpoint(clipper_conn, "simple-example", "doubles",
-                                    feature_sum)
+                                    feature_sum, registry='sum-model'))
     time.sleep(2)
 
     # For batch inputs set this number > 1
