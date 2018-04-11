@@ -147,7 +147,7 @@ def run(query_rate, num_samples):
     clipper_conn.start_clipper()
     model_name = "simple-example"
     python_deployer.create_endpoint(clipper_conn, model_name, "doubles",
-                                    feature_sum)
+                                    feature_sum,num_replicas=4)
     time.sleep(2)
 
     # Temp query generator
