@@ -11,7 +11,7 @@ import sys
 
 
 def predict(addr, x, batch=False):
-    url = "http://%s/simple-example/predict" % addr
+    url = "http://%s/sum-model/predict" % addr
 
     if batch:
         req_json = json.dumps({'input_batch': x})
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     time.sleep(2)
 
     # For batch inputs set this number > 1
-    batch_size = 1
+    batch_size = 5
 
     try:
         while True:
