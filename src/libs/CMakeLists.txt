@@ -71,3 +71,16 @@ export(TARGETS cqueue FILE ConcurrentQueueConfig.cmake)
 add_subdirectory(redox)
 
 add_subdirectory(rapidjson)
+
+###########################################
+#### XTL
+###########################################
+#
+#add_subdirectory(xtl)
+# TODO(avjykmr2): Build XTL from source
+#   - add nlohmann/json
+
+##########################################
+### Xtensor
+##########################################
+add_subdirectory(xtensor)
