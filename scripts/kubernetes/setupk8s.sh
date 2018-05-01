@@ -4,7 +4,7 @@ ssh_command()
 {
   NODE=node-$1
   COMMAND=$2
-  echo "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $NODE \"$COMMAND\""
+  echo "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $NODE '$COMMAND'"
 }
  
 ############################## PRE PROCESSING ################################
@@ -47,7 +47,7 @@ echo""
 #Installing pod network
 echo "Installing pod network"
 echo ""
-POD_NETWORK_COMMAND=$( ssh_command $MASTER_NODE "sudo sysctl net.bridge.bridge-nf-call-iptables=1; export kubever=$(kubectl version | base64 | tr -d '\n'); kubectl apply -f 'https://cloud.weave.works/k8s/net?k8s-version=\$kubever'" )
+POD_NETWORK_COMMAND=$( ssh_command $MASTER_NODE 'sudo sysctl net.bridge.bridge-nf-call-iptables=1; export kubever=$(kubectl version | base64 | tr -d "\n"); echo $kubever; kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"' )
 echo "$POD_NETWORK_COMMAND"
 echo ""
 eval "$POD_NETWORK_COMMAND"

@@ -11,7 +11,7 @@ import sys
 
 
 def predict(addr, x, batch=False):
-    url = "http://%s/simple-example/predict" % addr
+    url = "http://%s/sum-model/predict" % addr
 
     if batch:
         req_json = json.dumps({'input_batch': x})
@@ -33,21 +33,26 @@ def feature_sum(xs):
 # Stop Clipper on Ctrl-C
 def signal_handler(signal, frame):
     print("Stopping Clipper...")
-    clipper_conn = ClipperConnection(KubernetesContainerManager(useInternalIP=True))
+    clipper_conn = ClipperConnection(KubernetesContainerManager('1', useInternalIP=True))
     clipper_conn.stop_all()
     sys.exit(0)
 
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
-    clipper_conn = ClipperConnection(KubernetesContainerManager(useInternalIP=True))
+    clipper_conn = ClipperConnection(KubernetesContainerManager('1', useInternalIP=True))
     clipper_conn.start_clipper()
-    python_deployer.create_endpoint(clipper_conn, "simple-example", "doubles",
-                                    feature_sum, registry='sum-model'))
+    try:
+      python_deployer.create_endpoint(clipper_conn, "sum-model", "doubles",
+                                    feature_sum, registry='mghosh4')
+    except Exception as e:
+        print (e)
+        clipper_conn.stop_all()  
+    
     time.sleep(2)
 
     # For batch inputs set this number > 1
-    batch_size = 1
+    batch_size = 5
 
     try:
         while True:
@@ -61,4 +66,5 @@ if __name__ == '__main__':
                 predict(clipper_conn.get_query_addr(), 1) # query batch size is set to 1
             time.sleep(1)
     except Exception as e:
+        print (e)
         clipper_conn.stop_all()
