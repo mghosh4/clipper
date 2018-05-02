@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 add_executable(management_frontend src/management_frontend_main.cpp src/optimizer.hpp src/optimizer.cpp)
 
-target_link_libraries(management_frontend clipper redox boost httpserver cxxopts)
+target_link_libraries(management_frontend clipper redox boost httpserver cxxopts xtensor)
 
 ##################################
 # Tests for management
@@ -20,5 +20,6 @@ target_link_libraries(
     httpserver
     redox
     gtest
-    gmock_main cxxopts)
+    gmock_main cxxopts
+    xtensor)
 add_dependencies(unittests managementtests)

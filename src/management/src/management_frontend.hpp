@@ -67,7 +67,7 @@ const std::string GET_ALL_MODELS = ADMIN_PATH + "/get_all_models$";
 const std::string GET_MODEL = ADMIN_PATH + "/get_model$";
 const std::string GET_ALL_CONTAINERS = ADMIN_PATH + "/get_all_containers$";
 const std::string GET_CONTAINER = ADMIN_PATH + "/get_container$";
-const std::string PUT_APP_METRICS = ADMIN_PATH + "/put_query_rate";
+const std::string PUT_APP_METRICS = ADMIN_PATH + "/put_app_metrics";
 
 const std::string ADD_APPLICATION_JSON_SCHEMA = R"(
   {

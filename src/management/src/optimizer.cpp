@@ -20,11 +20,14 @@ using std::vector;
 using std::string;
 using std::unordered_map;
 
+using namespace management;
+
 void IterativeLatencyOptimizer::start() {
   AMEvent qr_event;
   do {
     q.wait_dequeue(qr_event);
-
+    // Compute resource allocation
+    // Publish resource allocation
 
   } while(!qr_event.poison_pill);
 }

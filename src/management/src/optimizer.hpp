@@ -59,11 +59,13 @@ namespace management {
     class IterativeLatencyOptimizer : public Optimizer {
 
     public:
-        IterativeLatencyOptimizer(redox::Redox redis_connection) : redis_connection_(redis_connection) {}
+        IterativeLatencyOptimizer(redox::Redox & redis_connection) {
+          redis_connection_ = redis_connection;
+        }
 
         void push_qr_event(std::vector<AppMetricEntry> app_metric_entries) {
           AMEvent qr_event;
-          qr_event.app_metric_entries = app_metric_entries
+          qr_event.app_metric_entries = app_metric_entries;
           q.enqueue(qr_event);
         }
 
