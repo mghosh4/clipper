@@ -22,5 +22,7 @@ int main(int argc, char* argv[]) {
   conf.set_redis_port(options["redis_port"].as<int>());
   conf.ready();
   management::RequestHandler rh(clipper::MANAGEMENT_FRONTEND_PORT);
+  management::IterativeLatencyOptimizer optimizer(rh.get_redis_connection());
+  rh.register_optimizer(optimizer);
   rh.start_listening();
 }
