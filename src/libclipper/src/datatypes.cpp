@@ -91,12 +91,14 @@ bool VersionedModelId::operator!=(const VersionedModelId &rhs) const {
   return !(name_ == rhs.name_ && id_ == rhs.id_);
 }
 
-bool QueryRateEntry::operator==(const QueryRateEntry &rhs) const {
-  return (app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_);
+bool AppMetricEntry::operator==(const AppMetricEntry &rhs) const {
+  return (app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_
+          && batch_size_ == rhs.batch_size_);
 }
 
-bool QueryRateEntry::operator!=(const QueryRateEntry &rhs) const {
-  return !(app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_);
+bool AppMetricEntry::operator!=(const AppMetricEntry &rhs) const {
+  return !(app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_
+          && batch_size_ == rhs.batch_size_);
 }
 
 Output::Output(const std::string y_hat,

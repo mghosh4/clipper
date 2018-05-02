@@ -323,10 +323,10 @@ std::vector<std::vector<uint8_t>> get_base64_encoded_byte_arrays(
   return byte_arrays;
 }
 
-std::vector<QueryRateEntry> get_query_rate_entries(rapidjson::Value& d, const char * key_name) {
+std::vector<AppMetricEntry> get_app_metric_entries(rapidjson::Value& d, const char * key_name) {
   rapidjson::Value& v =
       check_kv_type_and_return(d, key_name, rapidjson::kArrayType);
-  std::vector<QueryRateEntry> query_rate_entries;
+  std::vector<AppMetricEntry> query_rate_entries;
   query_rate_entries.reserve(v.Capacity());
   for (rapidjson::Value& elem : v.GetArray()) {
     if (!elem.IsObject()) {
@@ -342,7 +342,8 @@ std::vector<QueryRateEntry> get_query_rate_entries(rapidjson::Value& d, const ch
     }
     std::string app_name = get_string(elem, "app_name");
     double query_rate = get_double(elem, "query_rate");
-    query_rate_entries.push_back(QueryRateEntry(app_name, query_rate));
+    int batch_size = get_int(elem, "batch_size");
+    query_rate_entries.push_back(AppMetricEntry(app_name, query_rate, batch_size));
   }
   return query_rate_entries;
 }

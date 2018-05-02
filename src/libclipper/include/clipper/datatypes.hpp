@@ -55,24 +55,31 @@ class VersionedModelId {
   std::string id_;
 };
 
-class QueryRateEntry {
-  public:
-    QueryRateEntry(const std::string app_name, const double query_rate) :
-        app_name_(app_name), query_rate_(query_rate) {}
+class AppMetricEntry {
+ public:
+  AppMetricEntry(const std::string app_name, double query_rate, int batch_size) :
+    app_name_(app_name), query_rate_(query_rate), batch_size_(batch_size) {}
 
-    std::string get_app_name() const { return app_name_; }
-    double get_query_rate() const { return query_rate_; }
+  std::string get_app_name() const { return app_name_; }
 
-    QueryRateEntry(const QueryRateEntry &) = default;
-    QueryRateEntry &operator=(const QueryRateEntry &) = default;
+  double get_query_rate() const { return query_rate_; }
 
-    QueryRateEntry(QueryRateEntry &&) = default;
-    bool operator==(const QueryRateEntry &rhs) const;
-    bool operator!=(const QueryRateEntry &rhs) const;
+  int get_batch_size() const { return batch_size_; }
 
-  private:
-    std::string app_name_;
-    double query_rate_;
+  AppMetricEntry(const AppMetricEntry &) = default;
+
+  AppMetricEntry &operator=(const AppMetricEntry &) = default;
+
+  AppMetricEntry(AppMetricEntry &&) = default;
+
+  bool operator==(const AppMetricEntry &rhs) const;
+
+  bool operator!=(const AppMetricEntry &rhs) const;
+
+ private:
+  std::string app_name_;
+  double query_rate_;
+  int batch_size_;
 };
 
 class Output {

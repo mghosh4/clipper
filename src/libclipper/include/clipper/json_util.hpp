@@ -96,8 +96,8 @@ std::vector<std::vector<int>> get_int_arrays(rapidjson::Value& d,
 std::vector<std::vector<uint8_t>> get_base64_encoded_byte_arrays(
     rapidjson::Value& d, const char* key_name);
 
-std::vector<QueryRateEntry> get_query_rate_entries(rapidjson::Value& d,
-                                                   const char* key_name);
+std::vector<AppMetricEntry> get_app_metric_entries(rapidjson::Value& d,
+                                                   const char * key_name);
 
 std::vector<VersionedModelId> get_candidate_models(rapidjson::Value& d,
                                                    const char* key_name);
