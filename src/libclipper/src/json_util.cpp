@@ -323,6 +323,30 @@ std::vector<std::vector<uint8_t>> get_base64_encoded_byte_arrays(
   return byte_arrays;
 }
 
+std::vector<QueryRateEntry> get_query_rate_entries(rapidjson::Value& d, const char * key_name) {
+  rapidjson::Value& v =
+      check_kv_type_and_return(d, key_name, rapidjson::kArrayType);
+  std::vector<QueryRateEntry> query_rate_entries;
+  query_rate_entries.reserve(v.Capacity());
+  for (rapidjson::Value& elem : v.GetArray()) {
+    if (!elem.IsObject()) {
+      throw json_semantic_error("Array input of type " +
+                                kTypeNames[elem.GetType()] +
+                                " is not of type Object");
+    } else if (!elem.HasMember("app_name")) {
+      throw json_semantic_error(
+          "Candidate model JSON object missing app_name");
+    } else if (!elem.HasMember("query_rate")) {
+      throw json_semantic_error(
+          "Candidate model JSON object missing query_rate");
+    }
+    std::string app_name = get_string(elem, "app_name");
+    double query_rate = get_double(elem, "query_rate");
+    query_rate_entries.push_back(QueryRateEntry(app_name, query_rate));
+  }
+  return query_rate_entries;
+}
+
 std::vector<VersionedModelId> get_candidate_models(rapidjson::Value& d,
                                                    const char* key_name) {
   rapidjson::Value& v =

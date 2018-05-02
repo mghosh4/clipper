@@ -91,6 +91,14 @@ bool VersionedModelId::operator!=(const VersionedModelId &rhs) const {
   return !(name_ == rhs.name_ && id_ == rhs.id_);
 }
 
+bool QueryRateEntry::operator==(const QueryRateEntry &rhs) const {
+  return (app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_);
+}
+
+bool QueryRateEntry::operator!=(const QueryRateEntry &rhs) const {
+  return !(app_name_ == rhs.app_name_ && query_rate_ == rhs.query_rate_);
+}
+
 Output::Output(const std::string y_hat,
                const std::vector<VersionedModelId> models_used)
     : y_hat_(y_hat), models_used_(models_used) {}

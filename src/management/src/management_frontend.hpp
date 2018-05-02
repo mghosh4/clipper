@@ -12,6 +12,7 @@
 #include <server_http.hpp>
 
 #include "rapidjson/document.h"
+#include "optimizer.hpp"
 
 #include <clipper/config.hpp>
 #include <clipper/datatypes.hpp>
@@ -26,6 +27,7 @@
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using clipper::InputType;
 using clipper::VersionedModelId;
+using clipper::QueryRateEntry;
 using clipper::json::add_bool;
 using clipper::json::add_string;
 using clipper::json::add_string_array;
@@ -42,6 +44,7 @@ using clipper::json::redis_container_metadata_to_json;
 using clipper::json::redis_model_metadata_to_json;
 using clipper::json::set_string_array;
 using clipper::json::to_json_string;
+using clipper::json::get_query_rate_entries;
 using clipper::redis::prohibited_group_strings;
 
 namespace management {
@@ -64,6 +67,7 @@ const std::string GET_ALL_MODELS = ADMIN_PATH + "/get_all_models$";
 const std::string GET_MODEL = ADMIN_PATH + "/get_model$";
 const std::string GET_ALL_CONTAINERS = ADMIN_PATH + "/get_all_containers$";
 const std::string GET_CONTAINER = ADMIN_PATH + "/get_container$";
+const std::string POST_QUERY_RATE = ADMIN_PATH + "/post_query_rate";
 
 const std::string ADD_APPLICATION_JSON_SCHEMA = R"(
   {
@@ -139,6 +143,13 @@ const std::string SELECTION_JSON_SCHEMA = R"(
   }
 )";
 
+// TODO(avjykmr2): Change name
+const std::string GET_APP_INFO = R"(
+  {
+   "apps" := [{"app_name": string,"query_rate": double, "batch_size": int}]
+  }
+)";
+
 void respond_http(std::string content, std::string message,
                   std::shared_ptr<HttpServer::Response> response) {
   *response << "HTTP/1.1 " << message
@@ -158,7 +169,7 @@ std::string json_error_msg(const std::string& exception_msg,
 
 class RequestHandler {
  public:
-  RequestHandler(int portno) : server_(portno), state_db_{} {
+  RequestHandler(int portno, Optimizer optimizer = DummyOptimizer()) : server_(portno), state_db_{} {
     clipper::Config& conf = clipper::get_config();
     while (!redis_connection_.connect(conf.get_redis_address(),
                                       conf.get_redis_port())) {
@@ -426,6 +437,24 @@ class RequestHandler {
             respond_http(e.what(), "400 Bad Request", response);
           }
         });
+    server_.add_endpoint(
+        POST_QUERY_RATE, "POST",
+        [this](std::shared_ptr<HttpServer::Response> response,
+               std::shared_ptr<HttpServer::Request> request) {
+          try {
+            std::string result = post_query_rate(request->content.string());
+            respond_http(result, "200 OK", response);
+          }  catch (const json_parse_error& e) {
+            std::string err_msg =
+                json_error_msg(e.what(), SELECTION_JSON_SCHEMA);
+            respond_http(err_msg, "400 Bad Request", response);
+          } catch (const json_semantic_error& e) {
+            std::string err_msg =
+                json_error_msg(e.what(), SELECTION_JSON_SCHEMA);
+            respond_http(err_msg, "400 Bad Request", response);
+          }
+        });
+    optimizer_ = optimizer;
   }
 
   ~RequestHandler() {
@@ -1120,6 +1149,17 @@ class RequestHandler {
     return app_metadata["default_output"];
   }
 
+  std::string post_query_rate(const std::string& json) {
+    rapidjson::Document d;
+    parse_json(json, d);
+
+    std::vector<QueryRateEntry> query_rate_entries = get_query_rate_entries(d, "query_rates");
+    optimizer_.push_qr_event(query_rate_entries);
+    // Return empty json doc as ack.
+    rapidjson::Document response_doc;
+    return to_json_string(response_doc);
+  }
+
   /**
    * Processes a request to update a specified model to a
    * specified version
@@ -1196,13 +1236,17 @@ class RequestHandler {
     }
   }
 
-  void start_listening() { server_.start(); }
+  void start_listening() {
+    server_.start();
+    optimizer_.start();
+  }
 
  private:
   HttpServer server_;
   redox::Redox redis_connection_;
   redox::Subscriber redis_subscriber_;
   clipper::StateDB state_db_;
+  Optimizer optimizer_;
 };
 
 }  // namespace management

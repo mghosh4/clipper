@@ -55,6 +55,26 @@ class VersionedModelId {
   std::string id_;
 };
 
+class QueryRateEntry {
+  public:
+    QueryRateEntry(const std::string app_name, const double query_rate) :
+        app_name_(app_name), query_rate_(query_rate) {}
+
+    std::string get_app_name() const { return app_name_; }
+    double get_query_rate() const { return query_rate_; }
+
+    QueryRateEntry(const QueryRateEntry &) = default;
+    QueryRateEntry &operator=(const QueryRateEntry &) = default;
+
+    QueryRateEntry(QueryRateEntry &&) = default;
+    bool operator==(const QueryRateEntry &rhs) const;
+    bool operator!=(const QueryRateEntry &rhs) const;
+
+  private:
+    std::string app_name_;
+    double query_rate_;
+};
+
 class Output {
  public:
   Output(const std::string y_hat,
